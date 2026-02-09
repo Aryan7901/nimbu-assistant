@@ -1,0 +1,8 @@
+comtypes==1.4.15
+faster_whisper==1.2.1
+numpy==2.4.2
+ollama==0.6.1
+openwakeword==0.6.0
+pycaw==20251023
+sounddevice==0.5.5
+watchdog==6.0.0

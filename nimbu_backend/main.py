@@ -6,9 +6,9 @@ import json
 
 from voice_assistant import VoiceAssistantDaemon
 
-WAKE_WORD = "hey_mycroft"
-THRESHOLD = 0.3
-OLLAMA_MODEL = "qwen3:1.7b"
+WAKE_WORD = os.getenv("WAKE_WORD", "hey_mycroft")
+THRESHOLD = float(os.getenv("THRESHOLD", 0.3))
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3:1.7b")
 
 
 
@@ -71,7 +71,6 @@ class ConfigReloadHandler(FileSystemEventHandler):
             try:
                 with open(commands_file) as f:
                     config = json.load(f)
-                print(config)
                 print("✅ Config reloaded successfully")
                 
                 # Reinitialize the daemon
@@ -85,7 +84,7 @@ class ConfigReloadHandler(FileSystemEventHandler):
 if __name__ == "__main__":
     ensure_ollama_model(OLLAMA_MODEL)
     daemon_container = {}
-    daemon_container['daemon'] = VoiceAssistantDaemon(config=config,wake_word=WAKE_WORD, threshold=THRESHOLD)
+    daemon_container['daemon'] = VoiceAssistantDaemon(config=config,model=OLLAMA_MODEL,wake_word=WAKE_WORD, threshold=THRESHOLD)
     
     event_handler = ConfigReloadHandler(daemon_container)
     observer = Observer()

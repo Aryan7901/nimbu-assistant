@@ -4,12 +4,13 @@ from wake_word_detector import WakeWordDetector
 import numpy as np
 from faster_whisper import WhisperModel
 import sounddevice as sd
+import os
 
-WAKE_WORD_GAIN = 1.0
-SAMPLE_RATE = 16000
-RECORDING_DURATION = 3.5
-WAKE_WORD_BLOCKSIZE = 1280
-WHISPER_MODEL = "base.en"
+WAKE_WORD_GAIN = float(os.getenv("WAKE_WORD_GAIN",1.0))
+SAMPLE_RATE = int(os.getenv("SAMPLE_RATE",16000))
+RECORDING_DURATION = float(os.getenv("RECORDING_DURATION",3.5))
+WAKE_WORD_BLOCKSIZE = int(os.getenv("WAKE_WORD_BLOCKSIZE",1280))
+WHISPER_MODEL = os.getenv("WHISPER_MODEL","base.en")
 
 
 def play_ping_sound():
@@ -46,14 +47,14 @@ class SpeechToText:
         return " ".join([segment.text for segment in segments])
     
 class VoiceAssistantDaemon:
-    def __init__(self,config, wake_word="hey_mycroft", threshold=0.5):
+    def __init__(self,config,model, wake_word="hey_mycroft", threshold=0.5):
         print("=" * 60)
         print("🤖 VOICE ASSISTANT DAEMON INITIALIZING")
         print("=" * 60)
         
         self.wake_word_detector = WakeWordDetector(wake_word, threshold,WAKE_WORD_GAIN)
         self.stt = SpeechToText()
-        self.agent = FunctionAgent(config)
+        self.agent = FunctionAgent(config,model)
         self.wake_word=wake_word
         self.threshold=threshold
         self.fs = SAMPLE_RATE

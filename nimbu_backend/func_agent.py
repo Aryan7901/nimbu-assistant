@@ -2,14 +2,13 @@ import subprocess
 from func_utils import open_system_browser, set_system_brightness, set_system_volume
 import ollama
 
-OLLAMA_MODEL = "qwen3:1.7b"
-
 class FunctionAgent:
     tools=[]
     name_to_func_map={}
     config={"custom_commands":[]}
-    def __init__(self,config):
+    def __init__(self,config,model):
         self.config=config
+        self.model=model
         print(config)
         custom_tools = self.extract_config_tools()
         self.tools = [
@@ -90,7 +89,7 @@ class FunctionAgent:
         print(f"\n💬 Command: '{user_command}'")
 
         response = ollama.chat(
-            model=OLLAMA_MODEL, 
+            model=self.model, 
             messages=[{'role': 'user', 'content': user_command}], 
             tools=self.tools,
             options={'temperature':0},

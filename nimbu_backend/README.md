@@ -22,7 +22,7 @@ Nimbu operates in a continuous loop: monitoring for a wake word, transcribing yo
 * **100% Local:** Everything runs on your hardware (CPU/GPU). No internet required after setup.
 * **Natural Language Intelligence:** Understands context. "It's too loud" or "Mute the sound" both trigger the volume tool correctly.
 * **Hot-Reloading Config:** Modify `~/.nimbu/commands.json` and the assistant reloads your new commands instantly without a restart.
-* **Cross-Platform:** Native support for Windows, macOS, and Linux hardware controls.
+* **Cross-Platform:** Native support for Windows, macOS, and Linux hardware controls. Although testing has been primarily done on Linux. Feel free to raise an issue if you encounter issues on your OS.
 
 ---
 

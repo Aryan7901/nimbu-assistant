@@ -76,7 +76,7 @@ class ConfigReloadHandler(FileSystemEventHandler):
                 # Reinitialize the daemon
                 daemon:VoiceAssistantDaemon=self.daemon_container["daemon"]
                 print("🔄 Reinitializing daemon...")
-                daemon.agent.__init__(config)
+                daemon.agent.__init__(config,model=OLLAMA_MODEL)
                 print("✅ Daemon reinitialized with new config")
             except Exception as e:
                 print(f"❌ Error reloading config: {e}")

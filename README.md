@@ -47,7 +47,9 @@ Please follow the detailed installation and running instructions provided in eac
 
 
 ## DEMO
-<video controls src="demo.mp4" title="Title"></video>
+
+https://github.com/user-attachments/assets/ade41650-fa0d-4524-ae89-b9035d00dec8
+
 
 
 ## GUI

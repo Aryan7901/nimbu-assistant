@@ -84,7 +84,7 @@ class ConfigReloadHandler(FileSystemEventHandler):
 if __name__ == "__main__":
     ensure_ollama_model(OLLAMA_MODEL)
     daemon_container = {}
-    daemon_container['daemon'] = VoiceAssistantDaemon(config=config,model=OLLAMA_MODEL,wake_word=WAKE_WORD, threshold=THRESHOLD)
+    daemon_container['daemon'] = VoiceAssistantDaemon(config=config,model=OLLAMA_MODEL,wake_word=WAKE_WORD, threshold=THRESHOLD,wv_model_dir=model_dir)
     
     event_handler = ConfigReloadHandler(daemon_container)
     observer = Observer()

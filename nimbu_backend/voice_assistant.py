@@ -47,12 +47,12 @@ class SpeechToText:
         return " ".join([segment.text for segment in segments])
     
 class VoiceAssistantDaemon:
-    def __init__(self,config,model, wake_word="hey_mycroft", threshold=0.5):
+    def __init__(self,config,model,wv_model_dir, wake_word="hey_mycroft", threshold=0.5):
         print("=" * 60)
         print("🤖 VOICE ASSISTANT DAEMON INITIALIZING")
         print("=" * 60)
-        
-        self.wake_word_detector = WakeWordDetector(wake_word, threshold,WAKE_WORD_GAIN)
+        self.wv_model_dir=wv_model_dir
+        self.wake_word_detector = WakeWordDetector(wv_model_dir,wake_word, threshold,WAKE_WORD_GAIN)
         self.stt = SpeechToText()
         self.agent = FunctionAgent(config,model)
         self.wake_word=wake_word
@@ -139,7 +139,7 @@ class VoiceAssistantDaemon:
                 self.wake_detected=False
                 del self.wake_word_detector
                 gc.collect()
-                self.wake_word_detector=WakeWordDetector(self.wake_word,self.threshold,WAKE_WORD_GAIN)
+                self.wake_word_detector=WakeWordDetector(self.wv_model_dir,self.wake_word,self.threshold,WAKE_WORD_GAIN)
                 
                 print("\n" + "=" * 60)
                 print(f"🎤 Ready - Say '{self.wake_word_detector.wake_word}' again")

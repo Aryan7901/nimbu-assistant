@@ -25,12 +25,11 @@ def set_system_volume(level):
             subprocess.run(["amixer", "sset", "Master", f"{level}%"], check=True, stdout=subprocess.DEVNULL)
             return f"Linux volume set to {level}%"
         elif os_name == "Windows":
-            from comtypes import CLSCTX_ALL
-            from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-            devices = AudioUtilities.GetSpeakers()
-            interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-            volume = interface.QueryInterface(IAudioEndpointVolume)
+            from pycaw.pycaw import AudioUtilities
+
+            volume = AudioUtilities.GetSpeakers().EndpointVolume
             volume.SetMasterVolumeLevelScalar(level / 100.0, None)
+
             return f"Windows volume set to {level}%"
     except Exception as e:
         return f"Error setting volume: {str(e)}"

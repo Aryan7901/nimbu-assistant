@@ -44,3 +44,11 @@ Please follow the detailed installation and running instructions provided in eac
 * **Frontend Setup:** [Read nimbu_frontend/README.md](./nimbu_frontend/README.md)
 
 **Note:** The frontend is completely optional. You can manage everything by editing the `commands.json` file manually if you prefer a CLI-only experience.
+
+
+## DEMO
+<video controls src="demo.mp4" title="Title"></video>
+
+
+## GUI
+![alt text](gui.png)

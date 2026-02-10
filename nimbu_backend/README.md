@@ -49,8 +49,9 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 # 3. Install dependencies
 pip install -r requirements.txt
 # Windows only: pip install pycaw comtypes
-## 🚀 Running the Assistant
 ```
+## 🚀 Running the Assistant
+
 Follow these steps to get **Nimbu** up and running on your machine:
 
 1.  **Ensure Ollama is active:**

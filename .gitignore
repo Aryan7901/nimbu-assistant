@@ -1,2 +1,4 @@
 playground
 __pycache__
+nimbu_backend/build
+nimbu_backend/dist

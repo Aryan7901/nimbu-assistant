@@ -32,7 +32,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          check-latest: true
 
       - name: Install System Dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
@@ -40,30 +39,35 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libportaudio2 libgomp1
 
-      - name: Install Python Dependencies
-        run: |
-          cd nimbu_backend
-          python -m pip install --upgrade pip
-          pip install pyinstaller
-          pip install -r requirements.txt
-
-      - name: Package Backend
+      - name: Build and Package Backend
         shell: bash
         run: |
           cd nimbu_backend
           
-          # Dynamically locate the libraries on the runner
-          OWW_PATH=$(python3 -c "import openwakeword; import os; print(os.path.dirname(openwakeword.__file__))")
-          FW_PATH=$(python3 -c "import faster_whisper; import os; print(os.path.dirname(faster_whisper.__file__))")
-          
-          # Use different separators for Windows vs Linux/Mac
+          # Create and activate venv
+          python -m venv venv
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            SEP=";"
+            source venv/Scripts/activate
           else
-            SEP=":"
+            source venv/bin/activate
           fi
-
-          pyinstaller --onefile \
+          
+          # Install deps
+          pip install --upgrade pip
+          pip install pyinstaller
+          pip install -r requirements.txt
+          
+          # Get paths dynamically
+          SEP=$(python -c "import os; print(os.pathsep)")
+          OWW_PATH=$(python -c "import openwakeword, os; print(os.path.dirname(openwakeword.__file__))")
+          FW_PATH=$(python -c "import faster_whisper, os; print(os.path.dirname(faster_whisper.__file__))")
+          
+          echo "Verifying paths..."
+          echo "OWW: $OWW_PATH"
+          echo "FW: $FW_PATH"
+          
+          # Run Build
+          python -m PyInstaller --onefile \
             --name "VoiceDaemon" \
             --add-data "${OWW_PATH}/resources${SEP}openwakeword/resources" \
             --add-data "${FW_PATH}/assets${SEP}faster_whisper/assets" \

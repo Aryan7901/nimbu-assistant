@@ -39,7 +39,7 @@ Nimbu operates in a continuous loop: monitoring for a wake word, transcribing yo
 ### 2. Installation
 ```bash
 # 1. Clone the repository
-git clone [https://github.com/Aryan7901/nimbu-assistant.git](https://github.com/Aryan7901/nimbu-assistant.git)
+git clone https://github.com/Aryan7901/nimbu-assistant.git
 cd nimbu-assistant/nimbu_backend
 
 # 2. Create and activate virtual environment

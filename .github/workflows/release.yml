@@ -39,12 +39,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libportaudio2 libgomp1
 
-      - name: Package Backend
+      - name: Build and Package Backend
         shell: bash
         run: |
           cd nimbu_backend
           
-          # 1. Setup Venv & Install
+          # 1. Setup Venv
           python -m venv venv
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             source venv/Scripts/activate
@@ -52,28 +52,24 @@ jobs:
             source venv/bin/activate
           fi
           
-          pip install --upgrade pip
-          pip install pyinstaller -r requirements.txt
+          # 2. Upgrade pip correctly (Fixes the Exit Code 1 error)
+          python -m pip install --upgrade pip
           
-          # 2. Dynamic Discovery for ONNX models
-          # This finds the folder containing the 'embedding_model.onnx' or any .onnx file
+          # 3. Install dependencies
+          python -m pip install pyinstaller
+          python -m pip install -r requirements.txt
+          
+          # 4. Dynamic Discovery for ONNX models
+          # This logic finds where the .onnx files actually live
           OWW_INFO=$(python -c "
           import openwakeword, os, glob
           pkg_root = os.path.dirname(openwakeword.__file__)
-          # Search for any onnx files in the package
           onnx_files = glob.glob(os.path.join(pkg_root, '**', '*.onnx'), recursive=True)
-          
           if onnx_files:
-              # We want the folder that contains the models (usually 'resources')
-              # We'll go up from the first onnx file found until we hit 'resources' or the pkg root
-              model_path = os.path.dirname(onnx_files[0])
-              # If it's in .../openwakeword/resources/models, we want .../openwakeword/resources
-              if 'resources' in model_path:
-                  resource_dir = model_path.split('resources')[0] + 'resources'
-              else:
-                  resource_dir = model_path
-              
-              print(f'{resource_dir}|openwakeword/resources')
+              model_dir = os.path.dirname(onnx_files[0])
+              # Look for 'resources' in the path, otherwise use the direct parent
+              src = model_dir.split('resources')[0] + 'resources' if 'resources' in model_dir else model_dir
+              print(f'{src}|openwakeword/resources')
           else:
               print('NOT_FOUND|NOT_FOUND')
           ")
@@ -86,12 +82,10 @@ jobs:
             exit 1
           fi
 
-          echo "Found ONNX models at: $OWW_SRC"
-          
+          # 5. Build with OS-specific Separators
           SEP=$(python -c "import os; print(os.pathsep)")
           FW_PATH=$(python -c "import faster_whisper, os; print(os.path.dirname(faster_whisper.__file__))")
 
-          # 3. Build with ONNX support
           python -m PyInstaller --onefile \
             --name "VoiceDaemon" \
             --add-data "${OWW_SRC}${SEP}${OWW_DEST}" \

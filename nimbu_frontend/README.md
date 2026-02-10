@@ -48,7 +48,7 @@ Navigate to the frontend directory inside the main repository:
 ```bash
 
 # 1. Clone the repository if you have not cloned it yet
-git clone [https://github.com/Aryan7901/nimbu-assistant.git](https://github.com/Aryan7901/nimbu-assistant.git)
+git clone https://github.com/Aryan7901/nimbu-assistant.git
 
 cd nimbu-assistant/nimbu_frontend
 

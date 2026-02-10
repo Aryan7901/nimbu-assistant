@@ -32,7 +32,7 @@ To get the full experience running, you will need to set up both components.
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/Aryan7901/nimbu-assistant.git](https://github.com/Aryan7901/nimbu-assistant.git)
+git clone https://github.com/Aryan7901/nimbu-assistant.git
 cd nimbu-assistant
 ```
 

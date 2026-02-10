@@ -39,12 +39,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libportaudio2 libgomp1
 
-      - name: Build and Package Backend
+      - name: Package Backend
         shell: bash
         run: |
           cd nimbu_backend
           
-          # Create and activate venv
+          # 1. Setup Venv & Install
           python -m venv venv
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             source venv/Scripts/activate
@@ -52,33 +52,58 @@ jobs:
             source venv/bin/activate
           fi
           
-          # Install deps
           pip install --upgrade pip
-          pip install pyinstaller
-          pip install -r requirements.txt
+          pip install pyinstaller -r requirements.txt
           
-          # Get paths dynamically
+          # 2. Dynamic Discovery for ONNX models
+          # This finds the folder containing the 'embedding_model.onnx' or any .onnx file
+          OWW_INFO=$(python -c "
+          import openwakeword, os, glob
+          pkg_root = os.path.dirname(openwakeword.__file__)
+          # Search for any onnx files in the package
+          onnx_files = glob.glob(os.path.join(pkg_root, '**', '*.onnx'), recursive=True)
+          
+          if onnx_files:
+              # We want the folder that contains the models (usually 'resources')
+              # We'll go up from the first onnx file found until we hit 'resources' or the pkg root
+              model_path = os.path.dirname(onnx_files[0])
+              # If it's in .../openwakeword/resources/models, we want .../openwakeword/resources
+              if 'resources' in model_path:
+                  resource_dir = model_path.split('resources')[0] + 'resources'
+              else:
+                  resource_dir = model_path
+              
+              print(f'{resource_dir}|openwakeword/resources')
+          else:
+              print('NOT_FOUND|NOT_FOUND')
+          ")
+
+          OWW_SRC=$(echo $OWW_INFO | cut -d'|' -f1)
+          OWW_DEST=$(echo $OWW_INFO | cut -d'|' -f2)
+
+          if [ "$OWW_SRC" = "NOT_FOUND" ]; then
+            echo "Error: No ONNX models found in openwakeword package."
+            exit 1
+          fi
+
+          echo "Found ONNX models at: $OWW_SRC"
+          
           SEP=$(python -c "import os; print(os.pathsep)")
-          OWW_PATH=$(python -c "import openwakeword, os; print(os.path.dirname(openwakeword.__file__))")
           FW_PATH=$(python -c "import faster_whisper, os; print(os.path.dirname(faster_whisper.__file__))")
-          
-          echo "Verifying paths..."
-          echo "OWW: $OWW_PATH"
-          echo "FW: $FW_PATH"
-          
-          # Run Build
+
+          # 3. Build with ONNX support
           python -m PyInstaller --onefile \
             --name "VoiceDaemon" \
-            --add-data "${OWW_PATH}/resources${SEP}openwakeword/resources" \
+            --add-data "${OWW_SRC}${SEP}${OWW_DEST}" \
             --add-data "${FW_PATH}/assets${SEP}faster_whisper/assets" \
+            --hidden-import="onnxruntime" \
             --hidden-import="sounddevice" \
             --hidden-import="faster_whisper" \
             --hidden-import="openwakeword" \
-            --hidden-import="onnxruntime" \
             --hidden-import="requests" \
             --hidden-import="tqdm" \
             main.py
-
+      
       - name: Upload Backend Artifact
         uses: actions/upload-artifact@v4
         with:
